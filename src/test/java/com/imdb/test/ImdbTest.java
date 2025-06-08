@@ -6,7 +6,7 @@ import org.testng.annotations.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.regex.Pattern;
 import static com.codeborne.selenide.Selenide.*;
 import static com.codeborne.selenide.Condition.*;
 
@@ -17,11 +17,17 @@ public class ImdbTest {
         WebDriverManager.chromedriver().setup();
         Configuration.browser = "chrome";
         Configuration.browserSize = "1920x1080";
+        Configuration.timeout = 8000;
     }
 
     @Test(description = "Verify IMDb search and navigation to cast profile")
     public void testImdbQAFlow() {
         open("https://www.imdb.com");
+
+        // Accept cookies if the prompt appears
+        if ($x("//button[text()='Accept']").exists()) {
+            $x("//button[text()='Accept']").click();
+        }
 
         // Type search query
         $("[name='q']").setValue("QA");
@@ -43,24 +49,32 @@ public class ImdbTest {
             throw new AssertionError("No valid title suggestions found.");
         }
 
-        // Click first valid title
+        // Click first valid title and extract actual title text only
         SelenideElement firstTitle = titleSuggestions.get(0);
-        String firstTitleText = firstTitle.getText();
+        String firstTitleText = firstTitle.$(".searchResult__constTitle").getText().trim();
+
+        System.out.println("Selected title from search: " + firstTitleText);
+
         firstTitle.click();
 
-        // Validate title on detail page
+        // Validate title on detail page (strict match only on title)
         $("h1").shouldBe(visible).shouldHave(text(firstTitleText));
 
-        // Validate at least 4 cast members
-        ElementsCollection cast = $$(".ipc-metadata-list-summary-item__c").filter(visible);
+        // Validate at least 4 visible cast members
+        ElementsCollection cast = $$("[data-testid='title-cast-item']").filter(visible);
         cast.shouldHave(CollectionCondition.sizeGreaterThan(3));
 
         // Click 3rd cast member and save name
         SelenideElement thirdProfile = cast.get(2);
-        String thirdActorName = thirdProfile.$("a").getText();
-        thirdProfile.$("a").click();
+        String thirdActorName = thirdProfile.$("a").getText().trim();
+        thirdProfile.$("a").scrollIntoView(true).click();
 
         // Validate actor profile page
-        $("h1").shouldBe(visible).shouldHave(text(thirdActorName));
+        String actualProfileName = $("h1").shouldBe(visible).getText().trim();
+        System.out.println("Expected actor name (from cast): " + thirdActorName);
+        System.out.println("Actual profile page name: " + actualProfileName);
+        $("h1").shouldHave(matchText("(?i).*" + Pattern.quote(thirdActorName) + ".*"));
+
+
     }
 }
