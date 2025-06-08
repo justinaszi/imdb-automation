@@ -39,7 +39,8 @@ This project is a UI test automation solution for IMDb, implemented as a job ass
    ```bash
    git clone https://github.com/justinaszi/imdb-automation.git
    cd imdb-automation
-
+   ```
+   
 2. **Run Tests**
     ```bash
    ./gradlew clean test
