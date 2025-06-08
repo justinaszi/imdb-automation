@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+    id 'io.qameta.allure' version '2.11.2'
+}
+
+group = 'com.imdb.test'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.testng:testng:7.9.0'
+    testImplementation 'com.codeborne:selenide:7.2.2'
+    testImplementation 'io.github.bonigarcia:webdrivermanager:5.8.0'
+    testImplementation 'io.qameta.allure:allure-testng:2.25.0'
+}
+
+test {
+    useTestNG()
+    systemProperty 'selenide.browser', 'chrome'
+}
+
+allure {
+    version = '2.25.0'
+    useTestNG {
+        version = '2.25.0'
+    }
+}
