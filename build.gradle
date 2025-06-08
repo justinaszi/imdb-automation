@@ -1,31 +1,39 @@
 plugins {
     id 'java'
-    id 'io.qameta.allure' version '2.11.2'
+    id 'io.qameta.allure' version '2.11.2' //  Allure reporting plugin
 }
 
-group = 'com.imdb.test'
+group = 'com.imdb'
 version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
+allure {
+    version = '2.21.0' //  Allure commandline version
+    useTestNG {
+        version = '2.21.0' //  TestNG adapter for Allure
+    }
+}
+
 dependencies {
+    // ✅ WebDriver and test framework
     testImplementation 'org.testng:testng:7.9.0'
     testImplementation 'com.codeborne:selenide:7.2.2'
-    testImplementation 'io.github.bonigarcia:webdrivermanager:5.8.0'
-    testImplementation 'io.qameta.allure:allure-testng:2.25.0'
-    testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.9'
+    testImplementation 'io.github.bonigarcia:webdrivermanager:5.7.0'
+
+    // ✅ Allure integration for TestNG
+    testImplementation 'io.qameta.allure:allure-testng:2.21.0'
 }
 
 test {
     useTestNG()
-    systemProperty 'selenide.browser', 'chrome'
+    systemProperty 'allure.results.directory', "$buildDir/allure-results"
 }
 
-allure {
-    version = '2.25.0'
-    useTestNG {
-        version = '2.25.0'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17) // Ensure Java 17
     }
 }

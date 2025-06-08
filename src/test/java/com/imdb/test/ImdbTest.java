@@ -1,17 +1,20 @@
 package com.imdb.test;
 
 import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.SelenideElement;
+import com.imdb.test.pages.ActorProfilePage;
 import com.imdb.test.pages.HomePage;
 import com.imdb.test.pages.TitlePage;
-import com.imdb.test.pages.ActorProfilePage;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import io.qameta.allure.*;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.codeborne.selenide.SelenideElement;
-
 import java.util.List;
 
+@Epic("IMDb Regression Suite")
+@Feature("Search and Cast Profile Navigation")
 public class ImdbTest {
 
     @BeforeClass
@@ -23,27 +26,37 @@ public class ImdbTest {
     }
 
     @Test(description = "Verify IMDb search and navigation to cast profile")
+    @Story("Navigate from title search to actor profile")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Checks that a user can search for 'QA', select the first title, view cast, and navigate to the 3rd actor's profile.")
     public void testImdbQAFlow() {
-        HomePage homePage = new HomePage();
-        homePage.open();
-        homePage.acceptCookiesIfVisible();
-        homePage.searchFor("QA");
 
-        List<SelenideElement> titleSuggestions = homePage.getTitleSuggestions();
+        HomePage homePage = new HomePage();
+        TitlePage titlePage = new TitlePage();
+        ActorProfilePage actorPage = new ActorProfilePage();
+
+        Allure.step("Open IMDb homepage", homePage::open);
+        Allure.step("Accept cookies if visible", homePage::acceptCookiesIfVisible);
+
+        Allure.step("Search for 'QA'", () -> homePage.searchFor("QA"));
+
+        List<SelenideElement> titleSuggestions = Allure.step("Get title suggestions", homePage::getTitleSuggestions);
+
         SelenideElement firstTitle = titleSuggestions.get(0);
         String firstTitleText = firstTitle.$(".searchResult__constTitle").getText().trim();
-        System.out.println("Selected title from search: " + firstTitleText);
+        Allure.step("Selected title from search: " + firstTitleText);
         firstTitle.click();
 
-        TitlePage titlePage = new TitlePage();
-        titlePage.verifyTitle(firstTitleText);
+        Allure.step("Verify that title page matches selected title", () ->
+                titlePage.verifyTitle(firstTitleText));
 
-        SelenideElement thirdProfile = titlePage.getCastMember(2); // 3rd cast member (0-based index)
+        SelenideElement thirdProfile = Allure.step("Get 3rd cast member", () -> titlePage.getCastMember(2));
         String thirdActorName = titlePage.getActorName(thirdProfile);
-        System.out.println("Expected actor name (from cast): " + thirdActorName);
-        titlePage.clickActor(thirdProfile);
+        Allure.step("3rd cast member name: " + thirdActorName);
 
-        ActorProfilePage actorPage = new ActorProfilePage();
-        actorPage.verifyActorName(thirdActorName);
+        Allure.step("Click on 3rd cast member", () -> titlePage.clickActor(thirdProfile));
+
+        Allure.step("Verify actor profile page is correct", () ->
+                actorPage.verifyActorName(thirdActorName));
     }
 }
