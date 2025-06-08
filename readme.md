@@ -2,7 +2,7 @@
 
 This project is a UI test automation solution for IMDb, implemented as a job assignment for Luminor Bank. It automates a real-world regression test scenario using a modern tech stack and best practices like the Page Object Model (POM).
 
-📁 GitHub Repository:  
+📁 GitHub Repository:
 **[https://github.com/justinaszi/imdb-automation](https://github.com/justinaszi/imdb-automation)**
 
 ---
@@ -40,9 +40,15 @@ This project is a UI test automation solution for IMDb, implemented as a job ass
    git clone https://github.com/justinaszi/imdb-automation.git
    cd imdb-automation
 
-2. Run Tests
+2. **Run Tests**
+    ```bash
    ./gradlew clean test
+    ```
 
-3. Generate and view Allure report:
+3. **Generate and view Allure report:**
+    ```bash
    ./gradlew allureReport
+     ```
+   ```bash
    ./gradlew allureServe
+    ```

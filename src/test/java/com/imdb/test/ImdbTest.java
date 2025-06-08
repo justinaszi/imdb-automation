@@ -25,6 +25,7 @@ public class ImdbTest {
         Configuration.timeout = 8000;
     }
 
+
     @Test(description = "Verify IMDb search and navigation to cast profile")
     @Story("Navigate from title search to actor profile")
     @Severity(SeverityLevel.CRITICAL)

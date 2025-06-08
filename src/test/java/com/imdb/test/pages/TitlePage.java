@@ -1,6 +1,8 @@
 package com.imdb.test.pages;
 
 import com.codeborne.selenide.*;
+import org.openqa.selenium.interactions.Actions;
+import com.codeborne.selenide.WebDriverRunner;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +21,7 @@ public class TitlePage {
     public List<SelenideElement> getVisibleCast() {
         ElementsCollection castList = $$("[data-testid='title-cast-item']").filter(visible);
         castList.shouldHave(CollectionCondition.sizeGreaterThan(3));
-        return castList.asFixedIterable().stream().collect(Collectors.toList()); // ✅ Compatible with Java 8+
+        return castList.asFixedIterable().stream().collect(Collectors.toList());
     }
 
     // Retrieves the cast member at a given index (0-based)
@@ -39,8 +41,12 @@ public class TitlePage {
                 : actorLink.text().trim();
     }
 
-    // Scrolls to and clicks the actor's profile link
+    // Uses Actions to reliably click the actor's profile link
     public void clickActor(SelenideElement castMember) {
-        castMember.$("a").shouldBe(visible).scrollIntoView(true).click();
+        SelenideElement actorLink = castMember.$("a").shouldBe(visible);
+        new Actions(WebDriverRunner.getWebDriver())
+                .moveToElement(actorLink)
+                .click()
+                .perform();
     }
 }
