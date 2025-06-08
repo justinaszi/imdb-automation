@@ -64,17 +64,25 @@ public class ImdbTest {
         ElementsCollection cast = $$("[data-testid='title-cast-item']").filter(visible);
         cast.shouldHave(CollectionCondition.sizeGreaterThan(3));
 
-        // Click 3rd cast member and save name
+// Click 3rd cast member and save name
         SelenideElement thirdProfile = cast.get(2);
-        String thirdActorName = thirdProfile.$("a").getText().trim();
-        thirdProfile.$("a").scrollIntoView(true).click();
+        SelenideElement actorLink = thirdProfile.$("a").shouldBe(visible);
 
-        // Validate actor profile page
-        String actualProfileName = $("h1").shouldBe(visible).getText().trim();
+// Try to get nested <span> text if present
+        String thirdActorName = actorLink.find("span").exists()
+                ? actorLink.find("span").text().trim()
+                : actorLink.text().trim();
+
         System.out.println("Expected actor name (from cast): " + thirdActorName);
+
+// Scroll and click
+        actorLink.scrollIntoView(true).click();
+
+// Validate actor profile page
+        SelenideElement actorPageHeader = $("h1").shouldBe(visible);
+        String actualProfileName = actorPageHeader.getText().trim();
         System.out.println("Actual profile page name: " + actualProfileName);
-        $("h1").shouldHave(matchText("(?i).*" + Pattern.quote(thirdActorName) + ".*"));
 
-
+        actorPageHeader.shouldHave(matchText("(?i).*" + Pattern.quote(thirdActorName) + ".*"));
     }
 }
